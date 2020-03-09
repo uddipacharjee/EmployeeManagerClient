@@ -1,0 +1,1 @@
+insert into Employee (ID,EMAIL,JOINED_DATE,MOBILE,NAME,TEAM_NAME,TITLE)values (1,'u@s','2020-02-02','01755287603','uddip','soa','software engineer');
