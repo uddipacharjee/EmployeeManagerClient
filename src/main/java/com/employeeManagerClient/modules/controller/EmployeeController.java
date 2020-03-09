@@ -1,6 +1,7 @@
 package com.employeeManagerClient.modules.controller;
 
 import com.employeeManagerClient.modules.model.Employee;
+import com.employeeManagerClient.modules.service.EmployeeService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.*;
 @Controller
 public class EmployeeController {
     @Autowired
-    RestTemplate restTemplate;
+    EmployeeService employeeService;
 
     @InitBinder
     protected void initBinder(WebDataBinder binder){
@@ -35,38 +36,11 @@ public class EmployeeController {
 
     @GetMapping("/employees")
     public String showEmployeeList(ModelMap model){
-
-        String url="http://localhost:3000/find-all";
-        Object[] objects=restTemplate.getForObject(url,Object[].class);
-        ObjectMapper mapper = new ObjectMapper();
-        ArrayList<Employee> employees = (ArrayList<Employee>) mapper.convertValue(
-                Arrays.asList(objects),
-                new TypeReference<List<Employee>>() { });
-        /*
-        for (Object o:Arrays.asList(objects)) {
-            employees.add((Employee) o);
-            System.out.println(o);
-            System.out.println(o.getClass().getName());
-        }
-        */
-
-        System.out.println(employees);
-
-        System.out.println(Arrays.asList(objects).getClass().getName());
-        //model.addAttribute("employees",(List<Employee>)(Object) Arrays.asList(objects));
-
-
-        /*
-        ResponseEntity<List<Employee>> employeeResponse =
-                restTemplate.exchange("http://localhost:3000/find-all",
-                        HttpMethod.GET, null, new ParameterizedTypeReference<List<Employee>>() {
-                        });
-        List<Employee> employees = employeeResponse.getBody();
-        */
-
+        List<Employee> employees=employeeService.getEmployees();
         model.addAttribute("employees",employees);
         return "listOfEmployee";
     }
+
     @GetMapping("/add")
     public String showEmployeeForm(ModelMap model){
         model.addAttribute("employee",new Employee());
@@ -75,56 +49,31 @@ public class EmployeeController {
     @PostMapping("/add")
     public String addEmployee(@ModelAttribute("employee") Employee employee, BindingResult result,ModelMap model){
         if(result.hasErrors()){
-            //showEmployeeForm(model);
             return "employeeFrom";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Employee> request = new HttpEntity<>(employee, headers);
-        ResponseEntity<List<Employee>> employeeResponse =
-                restTemplate.exchange("http://localhost:3000/save",
-                        HttpMethod.POST, request, new ParameterizedTypeReference<List<Employee>>() {
-                        });
-        //showEmployeeList(model);
+        employeeService.addEmployee(employee);
         return "redirect:/employees";
     }
 
     @GetMapping("/update")
     public String showUpdateEmployee(@RequestParam Long id,ModelMap model){
-        ResponseEntity<Employee> employeeResponse =
-                restTemplate.exchange("http://localhost:3000/find-by-id/"+id,
-                        HttpMethod.GET, null, new ParameterizedTypeReference<Employee>() {
-                        });
-        Employee employee=employeeResponse.getBody();
+        Employee employee=employeeService.getEmployee(id);
         model.addAttribute("employee",employee);
         return "employeeForm";
     }
+
     @PostMapping("/update")
     public String updateEmployee(@ModelAttribute("employee") Employee employee,BindingResult result,ModelMap model){
         if(result.hasErrors()){
-            //showEmployeeForm(model);
             return "employeeFrom";
         }
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Employee> request = new HttpEntity<>(employee, headers);
-        ResponseEntity<Employee> employeeResponse =
-                restTemplate.exchange("http://localhost:3000/update",
-                        HttpMethod.PUT, request, new ParameterizedTypeReference<Employee>() {
-                        });
-        //showEmployeeList(model);
+        employeeService.updateEmployee(employee);
         return "redirect:/employees";
     }
 
-
     @RequestMapping(value = "/delete",method = RequestMethod.GET)
     public String deleteEmployee(@RequestParam Long id,ModelMap model){
-        ResponseEntity<Void> employeeResponse =
-                restTemplate.exchange("http://localhost:3000/delete-by-id/"+id,
-                        HttpMethod.DELETE, null, new ParameterizedTypeReference<Void>() {
-                        });
+        employeeService.deleteEmployee(id);
         return "redirect:/employees";
     }
 
