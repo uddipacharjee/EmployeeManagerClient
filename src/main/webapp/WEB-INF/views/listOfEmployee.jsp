@@ -2,7 +2,7 @@
 
 <H1>Employee List</H1>
 <div class="container">
-    <table class="table table-striped">
+    <table id="employeesTable" class="table table-striped">
         <thead>
         <tr>
             <th>Name</th>

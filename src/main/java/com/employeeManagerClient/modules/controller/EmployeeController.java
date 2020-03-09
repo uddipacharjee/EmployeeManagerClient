@@ -33,7 +33,16 @@ public class EmployeeController {
         binder.registerCustomEditor(String.class,stringTrimmerEditor);
         //System.out.println("strintrimmer");
     }
-
+    @GetMapping("/view/employees")
+    public String showAllEmployeeList(ModelMap model){
+        System.out.println("hello");
+        return "list-of-employee";
+    }
+    @GetMapping("/rest/employees")
+    @ResponseBody
+    public List<Employee> getAllEmployee(){
+        return employeeService.getEmployees();
+    }
     @GetMapping("/employees")
     public String showEmployeeList(ModelMap model){
         List<Employee> employees=employeeService.getEmployees();
