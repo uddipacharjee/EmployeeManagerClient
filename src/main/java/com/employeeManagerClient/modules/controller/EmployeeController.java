@@ -33,9 +33,8 @@ public class EmployeeController {
         binder.registerCustomEditor(String.class,stringTrimmerEditor);
         //System.out.println("strintrimmer");
     }
-    @GetMapping("/view/employees")
+    @GetMapping("/employees")
     public String showAllEmployeeList(ModelMap model){
-        System.out.println("hello");
         return "list-of-employee";
     }
     @GetMapping("/rest/employees")
@@ -43,13 +42,15 @@ public class EmployeeController {
     public List<Employee> getAllEmployee(){
         return employeeService.getEmployees();
     }
+
+    /*
     @GetMapping("/employees")
     public String showEmployeeList(ModelMap model){
         List<Employee> employees=employeeService.getEmployees();
         model.addAttribute("employees",employees);
         return "listOfEmployee";
     }
-
+    */
     @GetMapping("/add")
     public String showEmployeeForm(ModelMap model){
         model.addAttribute("employee",new Employee());
