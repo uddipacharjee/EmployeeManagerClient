@@ -16,6 +16,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -35,6 +36,7 @@ public class EmployeeController {
     }
     @GetMapping("/employees")
     public String showAllEmployeeList(ModelMap model){
+        model.addAttribute("employee",new Employee());
         return "list-of-employee";
     }
     @GetMapping("/rest/employees")
@@ -69,14 +71,31 @@ public class EmployeeController {
     public String showUpdateEmployee(@RequestParam Long id,ModelMap model){
         Employee employee=employeeService.getEmployee(id);
         model.addAttribute("employee",employee);
-        return "employeeForm";
+        //return "employeeForm";
+        System.out.println("GET--"+id);
+        System.out.println(employee);
+        return "list-of-employee";
+    }
+    @GetMapping("/rest/update")
+    @ResponseBody
+    public Employee showUpdateEmployee(@RequestParam Long id){
+        return employeeService.getEmployee(id);
+    }
+
+    @PostMapping("/rest/update")
+    @ResponseBody
+    public boolean updateEmployeeViaAjax(@RequestBody Employee employee){
+        employeeService.updateEmployee(employee);
+        return true;
+        //System.out.println(employee);
     }
 
     @PostMapping("/update")
     public String updateEmployee(@ModelAttribute("employee") Employee employee,BindingResult result,ModelMap model){
         if(result.hasErrors()){
-            return "employeeFrom";
+            //return "employeeFrom";
         }
+        System.out.println("POST--");
         employeeService.updateEmployee(employee);
         return "redirect:/employees";
     }
