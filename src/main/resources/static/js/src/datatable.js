@@ -1,4 +1,14 @@
 $(document).ready( function () {
+    function formatDate(data) {
+        const d = new Date(data);
+        const ye = new Intl.DateTimeFormat('en', {year: 'numeric'}).format(d);
+        const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(d);
+        const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(d);
+
+        //return `${ye}-${mo}-${da}`;
+        return `${da}-${mo}-${ye}`;
+    }
+
     var table = $('#employeesTable').DataTable({
         //"dom": '<"top"i>rt<"bottom"><"clear">',
         //"dom": 'frtip',
@@ -28,18 +38,13 @@ $(document).ready( function () {
 
                     */
                     return '<button id="edit'+data+'" type="button" class="edit btn btn-primary" data-id='+data+'>Edit</button>'+
-                        '<button type="button" class="btn btn-warning">Delete</button>';
+                        '<button type="button" class="delete btn btn-warning"  data-id='+data+'>Delete</button>';
                 }
             },
             {
                 "aTargets": [-3],
                 "mRender": function (data) {
-                    const d = new Date(data);
-                    const ye = new Intl.DateTimeFormat('en', {year: 'numeric'}).format(d);
-                    const mo = new Intl.DateTimeFormat('en', {month: 'short'}).format(d);
-                    const da = new Intl.DateTimeFormat('en', {day: '2-digit'}).format(d);
-
-                    return `${da}-${mo}-${ye}`;
+                    return formatDate(data);
                 }
             }
 
@@ -110,9 +115,19 @@ $(document).ready( function () {
     $("#mobileSearch").on('keyup click',function () {
         table.columns(5).search(this.value).draw();
     });
-
+    $(document).on('click','.delete',function () {
+        let id=$(this).data('id');
+        $.ajax({
+            url:"/rest/delete?id="+id,
+            contentType: "application/json",
+            dataType: 'json',
+            success: function(data) {
+                location.href="/employees";
+            }
+        });
+    });
     $(document).on('click','.edit',function () {
-        var editId=$(this).attr('id');
+        //var editId=$(this).attr('id');
         let id=$(this).data('id');
 
         $.ajax({
@@ -128,9 +143,10 @@ $(document).ready( function () {
                 var email=data.email;
                 var teamName=data.teamName;
                 var joinedDate=data.joinedDate;
+                //var joinedDate=formatDate(data.joinedDate);
                 var mobile=data.mobile;
-                alert("ID:"+data.id);
-                let htmlData = '<form id="editForm" method="post" action="/rest/update" modelAttribute="employee"' +
+
+                let htmlData = '<form id="editForm" method="post" action="/rest/update" ' +
                     '<div class="form-group">\n' +
                     '   <input type="hidden" id="empId" name="empId" value="'+empId+'">\n' +
                     '</div>' +
@@ -207,7 +223,9 @@ $(document).ready( function () {
                 $("#editModal").find('.modal-body').html(htmlData);
                 $("#editModal").modal();
                 $('#joinedDate').datepicker({
-                    format:'dd/mm/yyyy'
+                    //format:'dd/mm/yyyy'
+                    //format:'dd-M-yyyy'
+                    format:'yyyy-mm-dd'
                 });
                 //alert(data.name);
                 $("#editForm").on('submit',function (event) {

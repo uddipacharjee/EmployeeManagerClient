@@ -27,32 +27,33 @@ public class EmployeeController {
 
     @InitBinder
     protected void initBinder(WebDataBinder binder){
-        SimpleDateFormat dateFormat=new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
         StringTrimmerEditor stringTrimmerEditor=new StringTrimmerEditor(true);
 
         binder.registerCustomEditor(Date.class,new CustomDateEditor(dateFormat,false));
         binder.registerCustomEditor(String.class,stringTrimmerEditor);
         //System.out.println("strintrimmer");
     }
+    /*
     @GetMapping("/employees")
     public String showAllEmployeeList(ModelMap model){
         model.addAttribute("employee",new Employee());
         return "list-of-employee";
     }
+    */
+
     @GetMapping("/rest/employees")
     @ResponseBody
     public List<Employee> getAllEmployee(){
         return employeeService.getEmployees();
     }
 
-    /*
+
     @GetMapping("/employees")
-    public String showEmployeeList(ModelMap model){
-        List<Employee> employees=employeeService.getEmployees();
-        model.addAttribute("employees",employees);
-        return "listOfEmployee";
+    public String showEmployeeList(){
+        return "list-of-employee";
     }
-    */
+
     @GetMapping("/add")
     public String showEmployeeForm(ModelMap model){
         model.addAttribute("employee",new Employee());
@@ -84,7 +85,8 @@ public class EmployeeController {
 
     @PostMapping("/rest/update")
     @ResponseBody
-    public boolean updateEmployeeViaAjax(@RequestBody Employee employee){
+    public boolean updateEmployeeViaAjax(@Valid @RequestBody Employee employee,BindingResult result){
+        if(result.hasErrors()) return false;
         employeeService.updateEmployee(employee);
         return true;
         //System.out.println(employee);
@@ -106,5 +108,10 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
-
+    @RequestMapping(value = "/rest/delete",method = RequestMethod.GET)
+    @ResponseBody
+    public boolean deleteEmployeeViaAjax(@RequestParam Long id){
+        employeeService.deleteEmployee(id);
+        return true;
+    }
 }

@@ -1,10 +1,14 @@
 package com.employeeManagerClient.modules.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import javax.validation.Valid;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -16,6 +20,8 @@ public class Employee {
     private String title;
     private String email;
     private String teamName;
+    @Valid
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date joinedDate;
     private String mobile;
 

@@ -45,6 +45,7 @@
 <%@ include file="common/footer.jspf"%>
 <script>
     $('#joinedDate').datepicker({
-        format:'dd/mm/yyyy'
+        //format:'dd/mm/yyyy'
+        format:'yyyy-mm-dd'
     });
 </script>
